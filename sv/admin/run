@@ -1,0 +1,7 @@
+#!/bin/sh
+
+sv start mongodb || exit 1
+while ! nc -vz localhost 27017; do sleep 1; done
+
+exec 2>&1
+exec /PredictionIO-0.7.0/bin/predictionio-admin -Dio.prediction.base=/PredictionIO-0.7.0 -Dsbt.log.noformat=true -Dconfig.file=/PredictionIO-0.7.0/conf/predictionio.conf -Dhttp.port=9000 -Dlogger.file=/PredictionIO-0.7.0/conf/admin-logger.xml -Dpidfile.path=/var/run/admin.pid
