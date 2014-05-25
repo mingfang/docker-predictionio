@@ -60,3 +60,8 @@ RUN runsvdir-start & \
     cd /PredictionIO && \
     ./bin/settingsinit conf/init.json
 RUN rm /var/run/*.pid
+
+#Add test user
+RUN mongod -f /etc/mongod.conf & while ! mongo --eval "{ping:1}"; do sleep 3; done && \
+    mongo predictionio --eval "db.users.insert({_id : NumberInt(1), email : 'user', password : '`echo -n password|md5sum | cut -f1 -d' '`', firstname : 'user', lastname : 'user' })" && \
+    mongo --eval "db.getSiblingDB('admin').shutdownServer()"
