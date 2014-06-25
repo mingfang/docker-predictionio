@@ -1,7 +1,7 @@
 docker-predictionio
 ===================
 
-Run PredictionIO inside Docker
+Run [PredictionIO](http://prediction.io) inside Docker
 
 1. Run ```build``` to build the image
 2. Run ```shell``` to start the container
