@@ -20,7 +20,7 @@ RUN add-apt-repository ppa:webupd8team/java -y && \
     apt-get update && \
     echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y oracle-java7-installer
-
+ENV JAVA_HOME /usr/lib/jvm/java-7-oracle
 
 #MongoDB
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10 && \
@@ -29,23 +29,25 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10 && \
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mongodb-org
 RUN mkdir -p /data/db
 
-
 #graphchi
 RUN curl http://download.prediction.io/graphchi-cpp-cf/graphchi-cpp-cf-linux-x86_64-0a6545ccb7.tar.gz | tar xz
 
-#Hadoop
-RUN curl http://archive.apache.org/dist/hadoop/common/hadoop-1.2.1/hadoop-1.2.1-bin.tar.gz | tar xz
-
 #PredictionIO
-RUN wget http://download.prediction.io/PredictionIO-0.7.1.zip && \
+RUN wget http://download.prediction.io/PredictionIO-0.7.2.zip && \
     unzip PredictionIO*.zip && \
     rm PredictionIO*.zip
 RUN mv PredictionIO* PredictionIO
 
-ENV JAVA_HOME /usr/lib/jvm/java-7-oracle
+#Hadoop
+RUN curl http://archive.apache.org/dist/hadoop/common/hadoop-1.2.1/hadoop-1.2.1-bin.tar.gz | tar xz
 RUN cp /PredictionIO/conf/hadoop/* /hadoop-1.2.1/conf/
 RUN echo "io.prediction.commons.settings.hadoop.home=/hadoop-1.2.1" >> /PredictionIO/conf/predictionio.conf
 RUN /hadoop-1.2.1/bin/hadoop namenode -format
+
+#Python SDK
+RUN git clone https://github.com/PredictionIO/PredictionIO-Python-SDK.git
+RUN cd PredictionIO-Python-SDK && \
+    git checkout master
 
 #Add runit services
 ADD sv /etc/service 
@@ -55,13 +57,10 @@ ADD etc/mongod.conf /etc/
 
 #Initialize
 RUN runsvdir-start & \
-    while ! nc -vz localhost 27017;do sleep 3; done && \
+    while ! mongo --eval "{ping:1}";do sleep 3; done && \
     cat /var/log/mongodb/current && \
     cd /PredictionIO && \
-    ./bin/settingsinit conf/init.json
-RUN rm /var/run/*.pid
-
-#Add test user
-RUN mongod -f /etc/mongod.conf & while ! mongo --eval "{ping:1}"; do sleep 3; done && \
+    ./bin/settingsinit conf/init.json && \
     mongo predictionio --eval "db.users.insert({_id : NumberInt(1), email : 'user', password : '`echo -n password|md5sum | cut -f1 -d' '`', firstname : 'user', lastname : 'user' })" && \
     mongo --eval "db.getSiblingDB('admin').shutdownServer()"
+RUN rm /var/run/*.pid
