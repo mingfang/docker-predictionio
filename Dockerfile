@@ -33,7 +33,7 @@ RUN mkdir -p /data/db
 RUN curl http://download.prediction.io/graphchi-cpp-cf/graphchi-cpp-cf-linux-x86_64-0a6545ccb7.tar.gz | tar xz
 
 #PredictionIO
-RUN wget http://download.prediction.io/PredictionIO-0.7.2.zip && \
+RUN wget http://download.prediction.io/PredictionIO-0.7.3.zip && \
     unzip PredictionIO*.zip && \
     rm PredictionIO*.zip
 RUN mv PredictionIO* PredictionIO
