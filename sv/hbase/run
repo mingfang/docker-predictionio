@@ -1,0 +1,3 @@
+#!/bin/sh
+exec 2>&1
+exec /hbase/bin/hbase --config /hbase/conf master start

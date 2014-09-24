@@ -1,0 +1,7 @@
+#!/bin/sh
+
+sv start hbase
+echo "list" | /hbase/bin/hbase shell
+
+exec 2>&1
+exec /PredictionIO/bin/pio eventserver

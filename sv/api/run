@@ -1,3 +1,0 @@
-#!/bin/sh
-exec 2>&1
-exec /PredictionIO/bin/predictionio-api -Dio.prediction.base=/PredictionIO -Dsbt.log.noformat=true -Dconfig.file=/PredictionIO/conf/predictionio.conf -Dhttp.port=8000 -Dlogger.file=/PredictionIO/conf/api-logger.xml -Dpidfile.path=/var/run/api.pid

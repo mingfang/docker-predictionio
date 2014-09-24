@@ -22,45 +22,35 @@ RUN add-apt-repository ppa:webupd8team/java -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y oracle-java7-installer
 ENV JAVA_HOME /usr/lib/jvm/java-7-oracle
 
-#MongoDB
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10 && \
-    echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' > /etc/apt/sources.list.d/mongodb.list && \
-    apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mongodb-org
-RUN mkdir -p /data/db
-
-#graphchi
-RUN curl http://download.prediction.io/graphchi-cpp-cf/graphchi-cpp-cf-linux-x86_64-0a6545ccb7.tar.gz | tar xz
-
 #PredictionIO
-RUN wget http://download.prediction.io/PredictionIO-0.7.3.zip && \
-    unzip PredictionIO*.zip && \
-    rm PredictionIO*.zip
+RUN curl http://download.prediction.io/PredictionIO-0.8.0.tar.gz | tar zx
 RUN mv PredictionIO* PredictionIO
 
-#Hadoop
-RUN curl http://archive.apache.org/dist/hadoop/common/hadoop-1.2.1/hadoop-1.2.1-bin.tar.gz | tar xz
-RUN cp /PredictionIO/conf/hadoop/* /hadoop-1.2.1/conf/
-RUN echo "io.prediction.commons.settings.hadoop.home=/hadoop-1.2.1" >> /PredictionIO/conf/predictionio.conf
-RUN /hadoop-1.2.1/bin/hadoop namenode -format
+#Spark
+RUN curl http://d3kbcqa49mib13.cloudfront.net/spark-1.1.0-bin-hadoop2.4.tgz | tar zx
+RUN mv spark* spark
+RUN sed -i 's|SPARK_HOME=/path_to_apache_spark|SPARK_HOME=/spark|' /PredictionIO/conf/pio-env.sh
+
+#ElasticSearch
+RUN curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.2.tar.gz | tar zx
+RUN mv elasticsearch* elasticsearch
+
+#HBase
+RUN curl http://archive.apache.org/dist/hbase/hbase-0.98.6/hbase-0.98.6-hadoop2-bin.tar.gz | tar zx
+RUN mv hbase* hbase
+RUN echo "export JAVA_HOME=/usr/lib/jvm/java-7-oracle" >> /hbase/conf/hbase-env.sh
+
+RUN apt-get update
 
 #Python SDK
-RUN git clone https://github.com/PredictionIO/PredictionIO-Python-SDK.git
-RUN cd PredictionIO-Python-SDK && \
-    git checkout master
+RUN apt-get install -y python-pip
+RUN pip install pytz
+RUN pip install predictionio
 
 #Add runit services
 ADD sv /etc/service 
 
-#Configuration
-ADD etc/mongod.conf /etc/
+#Quickstart App
+ADD quickstartapp quickstartapp
 
-#Initialize
-RUN runsvdir-start & \
-    while ! mongo --eval "{ping:1}";do sleep 3; done && \
-    cat /var/log/mongodb/current && \
-    cd /PredictionIO && \
-    ./bin/settingsinit conf/init.json && \
-    mongo predictionio --eval "db.users.insert({_id : NumberInt(1), email : 'user', password : '`echo -n password|md5sum | cut -f1 -d' '`', firstname : 'user', lastname : 'user' })" && \
-    mongo --eval "db.getSiblingDB('admin').shutdownServer()"
-RUN rm /var/run/*.pid
+ENV PIO_HOME /PredictionIO

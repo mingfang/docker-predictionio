@@ -1,3 +1,0 @@
-#!/bin/sh
-exec 2>&1
-exec /PredictionIO/bin/predictionio-scheduler -Dio.prediction.base=/PredictionIO -Dsbt.log.noformat=true -Dconfig.file=/PredictionIO/conf/predictionio.conf -Dhttp.port=7000 -Dlogger.file=/PredictionIO/conf/scheduler-logger.xml -Dpidfile.path=/var/run/scheduler.pid -Dorg.quartz.properties=/PredictionIO/conf/quartz.properties
