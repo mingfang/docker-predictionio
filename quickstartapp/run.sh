@@ -1,5 +1,7 @@
 #!/bin/sh
 
+while ! nc -vz localhost 7070;do sleep 1; done
+
 set PIO_HOME=/PredictionIo
 
 cd /quickstartapp
