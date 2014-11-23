@@ -8,7 +8,7 @@ Run [PredictionIO](http://prediction.io) inside Docker
 3. Once inside the container, run ```runsvdir-start&``` to start everything
 4. The Dashboard is available on port 9000
 
-Run [quickstartapp](http://docs.prediction.io/0.8.0/tutorials/engines/quickstart.html)
+Run [quickstart](http://docs.prediction.io/0.8.2/recommendation/quickstart.html)
 
 1. Go to quickstartapp directory ```cd /quickstartapp```
 2. Build and Train Engine ```./run.sh```
