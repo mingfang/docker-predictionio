@@ -1,1 +1,1 @@
-docker build -t predictionio .
+docker build $@ -t predictionio .

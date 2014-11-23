@@ -25,8 +25,17 @@ RUN add-apt-repository ppa:webupd8team/java -y && \
 ENV JAVA_HOME /usr/lib/jvm/java-7-oracle
 
 #PredictionIO
-RUN curl http://download.prediction.io/PredictionIO-0.8.0.tar.gz | tar zx
+RUN curl http://download.prediction.io/PredictionIO-0.8.2.tar.gz | tar zx
 RUN mv PredictionIO* PredictionIO
+ENV PIO_HOME /PredictionIO
+ENV PATH $PATH:$PIO_HOME/bin
+
+#cache libraries
+RUN cp -r $PIO_HOME/templates/scala-parallel-recommendation Dummy && \
+    cd Dummy && \
+    $PIO_HOME/sbt/sbt package && \
+    cd .. && \
+    rm -rf Dummy
 
 #Spark
 RUN curl http://d3kbcqa49mib13.cloudfront.net/spark-1.1.0-bin-hadoop2.4.tgz | tar zx
@@ -49,10 +58,11 @@ RUN apt-get install -y python-pip
 RUN pip install pytz
 RUN pip install predictionio
 
+#For Spark MLlib
+RUN apt-get install -y libgfortran3
+
 #Add runit services
 ADD sv /etc/service 
 
-#Quickstart App
+#Quickstart App, http://docs.prediction.io/0.8.2/recommendation/quickstart.html
 ADD quickstartapp quickstartapp
-
-ENV PIO_HOME /PredictionIO

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+sv start elasticsearch || exit 1
+until curl http://localhost:9200; do echo "waiting for ElasticSearch to come online..."; sleep 3; done
+
+exec 2>&1
+exec /PredictionIO/bin/pio dashboard --ip 0.0.0.0
