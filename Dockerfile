@@ -7,13 +7,6 @@ RUN apt-get update
 RUN apt-get install -y runit
 CMD /usr/sbin/runsvdir-start
 
-#SSHD
-RUN apt-get install -y openssh-server && \
-    mkdir -p /var/run/sshd && \
-    echo 'root:root' |chpasswd
-RUN sed -i "s/session.*required.*pam_loginuid.so/#session    required     pam_loginuid.so/" /etc/pam.d/sshd
-RUN sed -i "s/PermitRootLogin without-password/#PermitRootLogin without-password/" /etc/ssh/sshd_config
-
 #Utilities
 RUN apt-get install -y vim less net-tools inetutils-ping curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common
 
@@ -25,7 +18,7 @@ RUN add-apt-repository ppa:webupd8team/java -y && \
 ENV JAVA_HOME /usr/lib/jvm/java-7-oracle
 
 #PredictionIO
-RUN curl http://download.prediction.io/PredictionIO-0.8.2.tar.gz | tar zx
+RUN curl http://download.prediction.io/PredictionIO-0.8.4.tar.gz | tar zx
 RUN mv PredictionIO* PredictionIO
 ENV PIO_HOME /PredictionIO
 ENV PATH $PATH:$PIO_HOME/bin
@@ -38,7 +31,7 @@ RUN cp -r $PIO_HOME/templates/scala-parallel-recommendation Dummy && \
     rm -rf Dummy
 
 #Spark
-RUN curl http://d3kbcqa49mib13.cloudfront.net/spark-1.1.0-bin-hadoop2.4.tgz | tar zx
+RUN curl http://d3kbcqa49mib13.cloudfront.net/spark-1.2.0-bin-hadoop2.4.tgz | tar zx
 RUN mv spark* spark
 RUN sed -i 's|SPARK_HOME=/path_to_apache_spark|SPARK_HOME=/spark|' /PredictionIO/conf/pio-env.sh
 
