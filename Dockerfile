@@ -29,6 +29,19 @@ RUN mv elasticsearch* elasticsearch
 RUN wget -O - http://archive.apache.org/dist/hbase/hbase-1.0.0/hbase-1.0.0-bin.tar.gz  | tar zx
 RUN mv hbase* hbase
 RUN echo "export JAVA_HOME=/usr/lib/jvm/java-7-oracle" >> /hbase/conf/hbase-env.sh
+RUN cat <<EOT > ${hbase_dir}/conf/hbase-site.xml
+<configuration>
+  <property>
+    <name>hbase.rootdir</name>
+    <value>file://${hbase_dir}/data</value>
+  </property>
+  <property>
+    <name>hbase.zookeeper.property.dataDir</name>
+    <value>${zookeeper_dir}</value>
+  </property>
+</configuration>
+EOT
+
 
 RUN apt-get update
 
@@ -45,13 +58,20 @@ RUN wget -O - http://download.prediction.io/PredictionIO-0.9.3.tar.gz | tar zx
 RUN mv PredictionIO* PredictionIO
 ENV PIO_HOME /PredictionIO
 ENV PATH $PATH:$PIO_HOME/bin
-RUN sed -i 's|SPARK_HOME=$PIO_HOME/vendors/spark-1.3.1-bin-hadoop2.6|SPARK_HOME=/spark|' /PredictionIO/conf/pio-env.sh
-RUN sed -i '41,48s/^/# /' /PredictionIO/conf/pio-env.sh 
-RUN sed -i '56,59s/^/# /' /PredictionIO/conf/pio-env.sh
-RUN sed -i '79s/# //' /PredictionIO/conf/pio-env.sh
-RUN sed -i 's|# PIO_STORAGE_SOURCES_HBASE_HOME=$PIO_HOME/vendors/hbase-1.0.0|PIO_STORAGE_SOURCES_HBASE_HOME=/hbase|' /PredictionIO/conf/pio-env.sh
-RUN sed -i 's|# PIO_STORAGE_SOURCES_ELASTICSEARCH_HOME=$PIO_HOME/vendors/elasticsearch-1.4.4|PIO_STORAGE_SOURCES_ELASTICSEARCH_HOME=/elasticsearch|' /PredictionIO/conf/pio-env.sh
 
+RUN sed -i 's|SPARK_HOME=$PIO_HOME/vendors/spark-1.3.1-bin-hadoop2.6|SPARK_HOME=/spark|' /PredictionIO/conf/pio-env.sh
+
+RUN sed "s|PIO_STORAGE_REPOSITORIES_METADATA_SOURCE=PGSQL|PIO_STORAGE_REPOSITORIES_METADATA_SOURCE=ELASTICSEARCH|" RUN sed
+RUN sed "s|PIO_STORAGE_REPOSITORIES_MODELDATA_SOURCE=PGSQL|PIO_STORAGE_REPOSITORIES_MODELDATA_SOURCE=LOCALFS|" /PredictionIO/conf/pio-env.sh
+RUN sed "s|PIO_STORAGE_REPOSITORIES_EVENTDATA_SOURCE=PGSQL|PIO_STORAGE_REPOSITORIES_EVENTDATA_SOURCE=HBASE|" /PredictionIO/conf/pio-env.sh
+RUN sed "s|PIO_STORAGE_SOURCES_PGSQL|# PIO_STORAGE_SOURCES_PGSQL|" /PredictionIO/conf/pio-env.sh
+RUN sed "s|# PIO_STORAGE_SOURCES_LOCALFS|PIO_STORAGE_SOURCES_LOCALFS|" /PredictionIO/conf/pio-env.sh
+RUN sed "s|# PIO_STORAGE_SOURCES_ELASTICSEARCH_TYPE|PIO_STORAGE_SOURCES_ELASTICSEARCH_TYPE|" /PredictionIO/conf/pio-env.sh
+RUN sed "s|# PIO_STORAGE_SOURCES_ELASTICSEARCH_HOME=.*|PIO_STORAGE_SOURCES_ELASTICSEARCH_HOME=/elasticsearch|" /PredictionIO/conf/pio-env.sh
+
+RUN sed"s|# PIO_STORAGE_SOURCES_HBASE|PIO_STORAGE_SOURCES_HBASE|" /PredictionIO/conf/pio-env.sh
+RUN sed"s|PIO_STORAGE_SOURCES_HBASE_HOME=.*|PIO_STORAGE_SOURCES_HBASE_HOME=$hbase_dir|" /PredictionIO/conf/pio-env.sh
+RUN sed"s|# HBASE_CONF_DIR=.*|HBASE_CONF_DIR=$hbase_dir/conf|" /PredictionIO/conf/pio-env.sh
 
 #cache libraries
 #RUN cp -r $PIO_HOME/templates/scala-parallel-recommendation Dummy && \
