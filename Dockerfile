@@ -46,6 +46,12 @@ RUN mv PredictionIO* PredictionIO
 ENV PIO_HOME /PredictionIO
 ENV PATH $PATH:$PIO_HOME/bin
 RUN sed -i 's|SPARK_HOME=$PIO_HOME/vendors/spark-1.3.1-bin-hadoop2.6|SPARK_HOME=/spark|' /PredictionIO/conf/pio-env.sh
+RUN sed -i '41,48s/^/# /' /PredictionIO/conf/pio-env.sh 
+RUN sed -i '56,59s/^/# /' /PredictionIO/conf/pio-env.sh
+RUN sed -i '79/# //' /PredictionIO/conf/pio-env.sh
+RUN sed -i 's|# PIO_STORAGE_SOURCES_HBASE_HOME=$PIO_HOME/vendors/hbase-1.0.0|PIO_STORAGE_SOURCES_HBASE_HOME=/hbase|' /PredictionIO/conf/pio-env.sh
+RUN sed -i 's|# PIO_STORAGE_SOURCES_ELASTICSEARCH_HOME=$PIO_HOME/vendors/elasticsearch-1.4.4|PIO_STORAGE_SOURCES_ELASTICSEARCH_HOME=/elasticsearch|' /PredictionIO/conf/pio-env.sh
+
 
 #cache libraries
 #RUN cp -r $PIO_HOME/templates/scala-parallel-recommendation Dummy && \
