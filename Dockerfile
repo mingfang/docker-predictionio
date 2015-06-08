@@ -29,15 +29,15 @@ RUN mv elasticsearch* elasticsearch
 RUN wget -O - http://archive.apache.org/dist/hbase/hbase-1.0.0/hbase-1.0.0-bin.tar.gz  | tar zx
 RUN mv hbase* hbase
 RUN echo "export JAVA_HOME=/usr/lib/jvm/java-7-oracle" >> /hbase/conf/hbase-env.sh
-RUN cat <<EOT > ${hbase_dir}/conf/hbase-site.xml
+RUN cat <<EOT > /hbase/conf/hbase-site.xml
 <configuration>
   <property>
     <name>hbase.rootdir</name>
-    <value>file://${hbase_dir}/data</value>
+    <value>file:///hbase/data</value>
   </property>
   <property>
     <name>hbase.zookeeper.property.dataDir</name>
-    <value>${zookeeper_dir}</value>
+    <value>/hbase/zookeeper</value>
   </property>
 </configuration>
 EOT
