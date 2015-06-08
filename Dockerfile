@@ -70,8 +70,8 @@ RUN sed "s|# PIO_STORAGE_SOURCES_ELASTICSEARCH_TYPE|PIO_STORAGE_SOURCES_ELASTICS
 RUN sed "s|# PIO_STORAGE_SOURCES_ELASTICSEARCH_HOME=.*|PIO_STORAGE_SOURCES_ELASTICSEARCH_HOME=/elasticsearch|" /PredictionIO/conf/pio-env.sh
 
 RUN sed"s|# PIO_STORAGE_SOURCES_HBASE|PIO_STORAGE_SOURCES_HBASE|" /PredictionIO/conf/pio-env.sh
-RUN sed"s|PIO_STORAGE_SOURCES_HBASE_HOME=.*|PIO_STORAGE_SOURCES_HBASE_HOME=$hbase_dir|" /PredictionIO/conf/pio-env.sh
-RUN sed"s|# HBASE_CONF_DIR=.*|HBASE_CONF_DIR=$hbase_dir/conf|" /PredictionIO/conf/pio-env.sh
+RUN sed"s|PIO_STORAGE_SOURCES_HBASE_HOME=.*|PIO_STORAGE_SOURCES_HBASE_HOME=/hbase|" /PredictionIO/conf/pio-env.sh
+RUN sed"s|# HBASE_CONF_DIR=.*|HBASE_CONF_DIR=/hbase/conf|" /PredictionIO/conf/pio-env.sh
 
 #cache libraries
 #RUN cp -r $PIO_HOME/templates/scala-parallel-recommendation Dummy && \
