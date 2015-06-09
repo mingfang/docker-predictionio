@@ -29,7 +29,7 @@ RUN mv elasticsearch* elasticsearch
 RUN wget -O - http://archive.apache.org/dist/hbase/hbase-1.0.0/hbase-1.0.0-bin.tar.gz  | tar zx
 RUN mv hbase* hbase
 RUN echo "export JAVA_HOME=/usr/lib/jvm/java-7-oracle" >> /hbase/conf/hbase-env.sh 
-RUN 
+ADD hbase-site.xml /hbase/conf/
 
 
 RUN apt-get update
