@@ -18,7 +18,7 @@ RUN add-apt-repository ppa:webupd8team/java -y && \
 ENV JAVA_HOME /usr/lib/jvm/java-7-oracle
 
 #Spark
-RUN wget -O - http://d3kbcqa49mib13.cloudfront.net/spark-1.2.0-bin-hadoop2.4.tgz | tar zx
+RUN wget -O - http://d3kbcqa49mib13.cloudfront.net/spark-1.3.1-bin-hadoop2.4.tgz | tar zx
 RUN mv spark* spark
 
 #ElasticSearch
@@ -41,11 +41,14 @@ RUN pip install predictionio
 RUN apt-get install -y libgfortran3
 
 #PredictionIO
-RUN wget -O - http://download.prediction.io/PredictionIO-0.9.1.tar.gz | tar zx
+RUN wget -O - http://download.prediction.io/PredictionIO-0.9.2.tar.gz | tar zx
 RUN mv PredictionIO* PredictionIO
 ENV PIO_HOME /PredictionIO
 ENV PATH $PATH:$PIO_HOME/bin
-RUN sed -i 's|SPARK_HOME=/path_to_apache_spark|SPARK_HOME=/spark|' /PredictionIO/conf/pio-env.sh
+RUN sed -i 's|^SPARK_HOME=.*|SPARK_HOME=/spark|' /PredictionIO/conf/pio-env.sh
+
+#Workaround Hadoop reverse DNS problem
+ADD hbase-site.xml /hbase/conf/hbase-site.xml
 
 #cache libraries
 #RUN cp -r $PIO_HOME/templates/scala-parallel-recommendation Dummy && \
@@ -57,10 +60,4 @@ RUN sed -i 's|SPARK_HOME=/path_to_apache_spark|SPARK_HOME=/spark|' /PredictionIO
 #Add runit services
 ADD sv /etc/service 
 
-#Test
-RUN runsvdir-start & \
-    while ! nc -vz localhost 7070;do sleep 3; done && \
-    pio status
-
-#Quickstart App, http://docs.prediction.io/0.8.2/recommendation/quickstart.html
-#ADD quickstartapp quickstartapp
+ADD quickstartapp quickstartapp
