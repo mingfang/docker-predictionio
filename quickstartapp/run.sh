@@ -1,4 +1,10 @@
-#!/bin/sh
+#!/bin/bash
+
+if [ ! -f /.dockerinit ]; then
+  echo "*** NOTICE: Make sure you're running this from inside the Docker container! ***"
+  exit 1
+fi
+
 
 echo "Step 1: Run PredictionIO"
 runsvdir-start&
@@ -65,6 +71,7 @@ python data/import_eventserver.py --access_key $KEY
 
 
 echo "Step 5. Deploy the Engine as a Service"
+sed -i "s|INVALID_APP_NAME|MyApp1|" /quickstartapp/MyRecommendation/engine.json
 
 echo "Building...  It may take some time to download all the librariesi."
 pio build --verbose
