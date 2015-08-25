@@ -38,7 +38,7 @@ echo "Step 3: Passed"
 echo "Step 4a. Collecting Data"
 
 # A user rates an item
-curl -i -X POST http://localhost/events.json?accessKey=$KEY \
+curl -i -X POST http://0.0.0.0:7070/events.json?accessKey=$KEY \
 -H "Content-Type: application/json" \
 -d '{
   "event" : "rate",
@@ -53,7 +53,7 @@ curl -i -X POST http://localhost/events.json?accessKey=$KEY \
 }'
 
 # A user buys an item
-curl -i -X POST http://localhost/events.json?accessKey=$KEY \
+curl -i -X POST http://0.0.0.0:7070/events.json?accessKey=$KEY \
 -H "Content-Type: application/json" \
 -d '{
   "event" : "buy",
