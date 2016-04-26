@@ -47,7 +47,7 @@ RUN pip install predictionio
 RUN apt-get install -y libgfortran3
 
 #PredictionIO
-RUN wget -O - http://download.prediction.io/PredictionIO-0.9.4.tar.gz | tar zx
+RUN wget -O - http://download.prediction.io/PredictionIO-0.9.5.tar.gz | tar zx
 RUN mv PredictionIO* PredictionIO
 ENV PIO_HOME /PredictionIO
 ENV PATH $PATH:$PIO_HOME/bin
