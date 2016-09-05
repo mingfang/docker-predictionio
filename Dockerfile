@@ -23,7 +23,7 @@ RUN add-apt-repository ppa:webupd8team/java -y && \
 ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 #PredictionIO
-RUN wget -O - http://download.prediction.io/PredictionIO-0.9.5.tar.gz | tar zx
+RUN wget -O - http://download.prediction.io/PredictionIO-0.9.6.tar.gz | tar zx
 RUN mv PredictionIO* PredictionIO
 ENV PIO_HOME /PredictionIO
 ENV PATH $PATH:$PIO_HOME/bin
