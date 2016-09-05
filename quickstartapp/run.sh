@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ ! -f /.dockerinit ]; then
+if [ ! -f /.dockerenv ]; then
   echo "*** NOTICE: Make sure you're running this from inside the Docker container! ***"
   exit 1
 fi
@@ -18,7 +18,7 @@ echo "Step 1: Passed"
 
 echo "Step 2. Create a new Engine from an Engine Template"
 
-echo "Y" | pio template get PredictionIO/template-scala-parallel-recommendation MyRecommendation --name "none" --package "none" --email "none"
+echo "n" | pio template get PredictionIO/template-scala-parallel-recommendation MyRecommendation --name "none" --package "none" --email "none"
 cd MyRecommendation
 
 echo "Step 2: Passed"
