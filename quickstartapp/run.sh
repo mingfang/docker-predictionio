@@ -77,6 +77,6 @@ echo "Building...  It may take some time to download all the libraries."
 pio build --verbose
 
 echo "Taining..."
-pio train
+pio train -- --driver-memory 4G
 
 echo "You may now deploy engine by running cd /quickstartapp/MyRecommendation && pio deploy --ip 0.0.0.0"
