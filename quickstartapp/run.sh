@@ -18,7 +18,7 @@ echo "Step 1: Passed"
 
 echo "Step 2. Create a new Engine from an Engine Template"
 
-echo "n" | pio template get PredictionIO/template-scala-parallel-recommendation MyRecommendation --name "none" --package "none" --email "none"
+echo "n" | pio template get apache/incubator-predictionio-template-recommender MyRecommendation --name "none" --package "none" --email "none"
 cd MyRecommendation
 
 echo "Step 2: Passed"
