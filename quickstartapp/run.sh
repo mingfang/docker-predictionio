@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 if [ ! -f /.dockerenv ]; then
   echo "*** NOTICE: Make sure you're running this from inside the Docker container! ***"
@@ -6,8 +7,8 @@ if [ ! -f /.dockerenv ]; then
 fi
 
 
-echo "Step 1: Run PredictionIO"
-runsvdir-start&
+echo "Step 1: Making sure everything is running"
+sv start /etc/service/*
 
 echo "EventServer may take a minute to start. Checking every 5s..."
 while ! nc -vz localhost 7070;do sleep 5; done
@@ -34,37 +35,7 @@ echo "KEY=$KEY"
 pio app list
 echo "Step 3: Passed"
 
-
-echo "Step 4a. Collecting Data"
-
-# A user rates an item
-curl -i -X POST http://0.0.0.0:7070/events.json?accessKey=$KEY \
--H "Content-Type: application/json" \
--d '{
-  "event" : "rate",
-  "entityType" : "user"
-  "entityId" : <USER ID>,
-  "targetEntityType" : "item",
-  "targetEntityId" : <ITEM ID>,
-  "properties" : {
-    "rating" : <RATING>
-  }
-  "eventTime" : <TIME OF THIS EVENT>
-}'
-
-# A user buys an item
-curl -i -X POST http://0.0.0.0:7070/events.json?accessKey=$KEY \
--H "Content-Type: application/json" \
--d '{
-  "event" : "buy",
-  "entityType" : "user"
-  "entityId" : <USER ID>,
-  "targetEntityType" : "item",
-  "targetEntityId" : <ITEM ID>,
-  "eventTime" : <TIME OF THIS EVENT>
-}'
-
-echo "Step 4b. Import Sample Data"
+echo "Step 4 Import Sample Data"
 
 curl https://raw.githubusercontent.com/apache/spark/master/data/mllib/sample_movielens_data.txt --create-dirs -o data/sample_movielens_data.txt
 python data/import_eventserver.py --access_key $KEY
