@@ -15,4 +15,7 @@ Run [quickstart](http://docs.prediction.io/templates/recommendation/quickstart/)
 3. Deploy Engine ```cd MyRecommendation && pio deploy --ip 0.0.0.0&```
 4. Your Engine will now listen on port 8000
 
+Run [Multiple Engines]()
 
+1. On deployment of the second Engine, run ```pio deploy --ip 0.0.0.0 --port 8001 &```
+2. For additional engines, use 8001-8006
