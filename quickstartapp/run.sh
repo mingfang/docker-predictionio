@@ -10,8 +10,8 @@ fi
 echo "Step 1: Making sure everything is running"
 sv start /etc/service/*
 
-echo "EventServer may take a minute to start. Checking every 5s..."
-while ! nc -vz localhost 7070;do sleep 5; done
+echo "EventServer may take a minute to start..."
+until curl http://localhost:7070; do echo "waiting for EventServer to come online..."; sleep 3; done
 
 pio status
 echo "Step 1: Passed"
@@ -19,7 +19,7 @@ echo "Step 1: Passed"
 
 echo "Step 2. Create a new Engine from an Engine Template"
 
-echo "n" | pio template get apache/incubator-predictionio-template-recommender MyRecommendation --name "none" --package "none" --email "none"
+echo "n" | pio template get apache/incubator-predictionio-template-recommender MyRecommendation --name "QuickStart" --package "quickstart" --email "none"
 cd MyRecommendation
 
 echo "Step 2: Passed"
@@ -28,7 +28,7 @@ echo "Step 2: Passed"
 echo "Step 3. Generate an App ID and Access Key"
 
 #echo "YES" | pio app delete MyApp1
-pio app new MyApp1 > log.txt
+pio app new MyApp1 --access-key `openssl rand -base64 32` > log.txt
 KEY=$(grep "Access Key:" log.txt | awk '{print $5}')
 echo "KEY=$KEY"
 
@@ -50,4 +50,5 @@ pio build --verbose
 echo "Taining..."
 pio train -- --driver-memory 4G
 
-echo "You may now deploy engine by running cd /quickstartapp/MyRecommendation && pio deploy --ip 0.0.0.0"
+echo "You may now deploy engine by running: cd /quickstartapp/MyRecommendation && pio deploy --ip 0.0.0.0&"
+echo "Sample REST call: curl -H \"Content-Type: application/json\" -d '{ \"user\": \"1\", \"num\": 4 }' http://localhost:8000/queries.json|jq"

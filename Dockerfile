@@ -26,11 +26,6 @@ RUN add-apt-repository ppa:webupd8team/java -y && \
     rm -r /var/cache/oracle-jdk8-installer
 ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
-#PredictionIO
-RUN wget -O - http://download.prediction.io/PredictionIO-0.9.6.tar.gz | tar zx
-RUN mv PredictionIO* PredictionIO
-ENV PIO_HOME /PredictionIO
-ENV PATH $PATH:$PIO_HOME/bin
 
 #Spark
 RUN wget -O - http://d3kbcqa49mib13.cloudfront.net/spark-1.5.1-bin-hadoop2.6.tgz | tar zx
@@ -53,8 +48,18 @@ RUN pip install predictionio
 #For Spark MLlib
 RUN apt-get install -y libgfortran3 libatlas3-base libopenblas-base
 
+#PredictionIO
+RUN wget -O - http://www-us.apache.org/dist/incubator/predictionio/0.10.0-incubating/apache-predictionio-0.10.0-incubating.tar.gz | tar zx && \
+    cd apache-predictionio* && \
+    ./make-distribution.sh && \
+    tar zxvf PredictionIO-0.10.0-incubating.tar.gz && \
+    rm *gz && \
+    mv PredictionIO* /PredictionIO
+ENV PIO_HOME /PredictionIO
+ENV PATH $PATH:$PIO_HOME/bin
+
 #Download SBT
-RUN /PredictionIO/sbt/sbt package 
+#RUN /PredictionIO/sbt/sbt package 
 
 #Configuration
 RUN sed -i 's|SPARK_HOME=.*|SPARK_HOME=/spark|' /PredictionIO/conf/pio-env.sh
