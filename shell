@@ -1,1 +1,1 @@
-docker run -v `pwd`:/docker -p 9000:9000 -p 8000:8000 -p 7070:7070 --rm -i -t predictionio /bin/bash
+docker run -v `pwd`:/docker -p 9000:9000 -p 8000:8000 -p 8001:8001 -p 8002:8002 -p 8003:8003 -p 8004:8004 -p 8005:8005 -p 8006:8006 -p 7070:7070 --rm -i -t predictionio /bin/bash
