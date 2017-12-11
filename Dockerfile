@@ -1,21 +1,20 @@
-FROM ubuntu:16.04
+FROM ubuntu:16.04 as base
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    LANG=en_US.UTF-8 \
-    TERM=xterm
+ENV DEBIAN_FRONTEND=noninteractive TERM=xterm
 RUN echo "export > /etc/envvars" >> /root/.bashrc && \
-    echo "export PS1='\e[1;31m\]\u@\h:\w\\$\[\e[0m\] '" | tee -a /root/.bashrc /etc/bash.bashrc && \
-    echo "alias tcurrent='tail /var/log/*/current -f'" | tee -a /root/.bashrc /etc/bash.bashrc
+    echo "export PS1='\[\e[1;31m\]\u@\h:\w\\$\[\e[0m\] '" | tee -a /root/.bashrc /etc/skel/.bashrc && \
+    echo "alias tcurrent='tail /var/log/*/current -f'" | tee -a /root/.bashrc /etc/skel/.bashrc
 
 RUN apt-get update
-RUN apt-get install -y locales && locale-gen en_US en_US.UTF-8
+RUN apt-get install -y locales && locale-gen en_US.UTF-8 && dpkg-reconfigure locales
+ENV LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 
 # Runit
 RUN apt-get install -y --no-install-recommends runit
-CMD export > /etc/envvars && /usr/sbin/runsvdir-start
+CMD bash -c 'export > /etc/envvars && /usr/sbin/runsvdir-start'
 
 # Utilities
-RUN apt-get install -y --no-install-recommends vim less net-tools inetutils-ping wget curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common jq psmisc iproute python ssh rsync
+RUN apt-get install -y --no-install-recommends vim less net-tools inetutils-ping wget curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common jq psmisc iproute python ssh rsync gettext-base
 
 #Install Oracle Java 8
 RUN add-apt-repository ppa:webupd8team/java -y && \
@@ -28,15 +27,15 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 
 #Spark
-RUN wget -O - http://d3kbcqa49mib13.cloudfront.net/spark-1.5.1-bin-hadoop2.6.tgz | tar zx
+RUN wget -O - http://www-us.apache.org/dist/spark/spark-2.2.1/spark-2.2.1-bin-hadoop2.7.tgz | tar zx
 RUN mv /spark* /spark
 
 #ElasticSearch
-RUN wget -O - https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.4.tar.gz | tar zx
+RUN wget -O - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.5.2.tar.gz | tar zx
 RUN mv /elasticsearch* /elasticsearch
 
 #HBase
-RUN wget -O - http://archive.apache.org/dist/hbase/hbase-1.0.0/hbase-1.0.0-bin.tar.gz  | tar zx
+RUN wget -O - http://www-us.apache.org/dist/hbase/1.2.6/hbase-1.2.6-bin.tar.gz | tar zx
 RUN mv /hbase* /hbase
 RUN echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle" >> /hbase/conf/hbase-env.sh 
 
@@ -49,12 +48,23 @@ RUN pip install predictionio
 RUN apt-get install -y libgfortran3 libatlas3-base libopenblas-base
 
 #PredictionIO
-RUN wget -O - http://www-us.apache.org/dist/incubator/predictionio/0.10.0-incubating/apache-predictionio-0.10.0-incubating.tar.gz | tar zx && \
-    cd apache-predictionio* && \
-    ./make-distribution.sh && \
-    tar zxvf PredictionIO-0.10.0-incubating.tar.gz && \
-    rm *gz && \
-    mv PredictionIO* /PredictionIO
+
+FROM base as build
+
+RUN mkdir -p /apache-predictionio
+WORKDIR /apache-predictionio
+RUN wget -O - http://www-us.apache.org/dist/incubator/predictionio/0.12.0-incubating/apache-predictionio-0.12.0-incubating.tar.gz | tar zx
+RUN ./make-distribution.sh
+RUN tar zxvf PredictionIO-*-incubating.tar.gz
+RUN rm PredictionIO-*-incubating.tar.gz
+RUN mv PredictionIO* /PredictionIO
+
+FROM base as final
+COPY --from=build /PredictionIO /PredictionIO
+
+RUN useradd elasticsearch
+RUN chown -R elasticsearch /elasticsearch
+
 ENV PIO_HOME /PredictionIO
 ENV PATH $PATH:$PIO_HOME/bin
 

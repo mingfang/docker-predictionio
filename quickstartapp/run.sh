@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+echo "*** WARNING: THIS IS FOR DEMONSTRATION PURPOSE ONLY. DO NOT USE FOR PRODUCTION! ***"
+
 if [ ! -f /.dockerenv ]; then
   echo "*** NOTICE: Make sure you're running this from inside the Docker container! ***"
   exit 1
@@ -19,7 +21,8 @@ echo "Step 1: Passed"
 
 echo "Step 2. Create a new Engine from an Engine Template"
 
-echo "n" | pio template get apache/incubator-predictionio-template-recommender MyRecommendation --name "QuickStart" --package "quickstart" --email "none"
+rm -r MyRecommendation
+git clone --depth 1 https://github.com/apache/incubator-predictionio-template-recommender.git MyRecommendation
 cd MyRecommendation
 
 echo "Step 2: Passed"
@@ -27,12 +30,10 @@ echo "Step 2: Passed"
 
 echo "Step 3. Generate an App ID and Access Key"
 
-#echo "YES" | pio app delete MyApp1
-pio app new MyApp1 --access-key `openssl rand -base64 32` > log.txt
-KEY=$(grep "Access Key:" log.txt | awk '{print $5}')
-echo "KEY=$KEY"
+(echo "YES" | pio app delete MyApp1) || true
+KEY='LYH_SlbnDpJIfHLiPYPx-sZaC4swYn0hmNEI7f5bgznabP_SoNcbshzDMZTg9tFY'
+pio app new MyApp1 --access-key=$KEY
 
-pio app list
 echo "Step 3: Passed"
 
 echo "Step 4 Import Sample Data"
@@ -47,8 +48,10 @@ sed -i "s|INVALID_APP_NAME|MyApp1|" /quickstartapp/MyRecommendation/engine.json
 echo "Building...  It may take some time to download all the libraries."
 pio build --verbose
 
-echo "Taining..."
+echo "Taining(increase memory if you get stackoverflow errors)..."
 pio train -- --driver-memory 4G
 
 echo "You may now deploy engine by running: cd /quickstartapp/MyRecommendation && pio deploy --ip 0.0.0.0&"
 echo "Sample REST call: curl -H \"Content-Type: application/json\" -d '{ \"user\": \"1\", \"num\": 4 }' http://localhost:8000/queries.json|jq"
+echo "*** WARNING: THIS IS FOR DEMONSTRATION PURPOSE ONLY. DO NOT USE FOR PRODUCTION! ***"
+

@@ -1,3 +1,8 @@
-#!/bin/sh
+#!/bin/bash
+
+#sv start socklog-unix || exit 1
+
+source /etc/envvars
+
 exec 2>&1
-exec /elasticsearch/bin/elasticsearch
+chpst -u elasticsearch /elasticsearch/bin/elasticsearch
