@@ -21,7 +21,6 @@ echo "Step 1: Passed"
 
 echo "Step 2. Create a new Engine from an Engine Template"
 
-rm -r MyRecommendation
 git clone --depth 1 https://github.com/apache/incubator-predictionio-template-recommender.git MyRecommendation
 cd MyRecommendation
 
