@@ -49,18 +49,8 @@ RUN apt-get install -y libgfortran3 libatlas3-base libopenblas-base
 
 #PredictionIO
 
-FROM base as build
-
-RUN mkdir -p /apache-predictionio
-WORKDIR /apache-predictionio
-RUN wget -O - http://www-us.apache.org/dist/incubator/predictionio/0.12.0-incubating/apache-predictionio-0.12.0-incubating.tar.gz | tar zx
-RUN ./make-distribution.sh
-RUN tar zxvf PredictionIO-*-incubating.tar.gz
-RUN rm PredictionIO-*-incubating.tar.gz
+RUN wget -O - http://www-us.apache.org/dist/predictionio/0.12.1/apache-predictionio-0.12.1-bin.tar.gz | tar zx
 RUN mv PredictionIO* /PredictionIO
-
-FROM base as final
-COPY --from=build /PredictionIO /PredictionIO
 
 RUN useradd elasticsearch
 RUN chown -R elasticsearch /elasticsearch
