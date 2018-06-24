@@ -35,7 +35,7 @@ RUN wget -O - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch
 RUN mv /elasticsearch* /elasticsearch
 
 #HBase
-RUN wget -O - http://www-us.apache.org/dist/hbase/1.2.6/hbase-1.2.6-bin.tar.gz | tar zx
+RUN wget -O - http://www-us.apache.org/dist/hbase/1.2.6.1/hbase-1.2.6.1-bin.tar.gz | tar zx
 RUN mv /hbase* /hbase
 RUN echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle" >> /hbase/conf/hbase-env.sh 
 
