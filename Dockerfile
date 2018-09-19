@@ -27,7 +27,7 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 
 #Spark
-RUN wget -O - http://www-us.apache.org/dist/spark/spark-2.2.2/spark-2.2.2-bin-hadoop2.7.tgz | tar zx
+RUN wget -O - http://archive.apache.org/dist/spark/spark-2.2.2/spark-2.2.2-bin-hadoop2.7.tgz | tar zx
 RUN mv /spark* /spark
 
 #ElasticSearch
@@ -35,7 +35,7 @@ RUN wget -O - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch
 RUN mv /elasticsearch* /elasticsearch
 
 #HBase
-RUN wget -O - http://www-us.apache.org/dist/hbase/1.2.7/hbase-1.2.7-bin.tar.gz | tar zx
+RUN wget -O - http://archive.apache.org/dist/hbase/1.2.7/hbase-1.2.7-bin.tar.gz | tar zx
 RUN mv /hbase* /hbase
 RUN echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle" >> /hbase/conf/hbase-env.sh 
 
@@ -49,7 +49,7 @@ RUN apt-get install -y libgfortran3 libatlas3-base libopenblas-base
 
 #PredictionIO
 
-RUN wget -O - http://www-us.apache.org/dist/predictionio/0.12.1/apache-predictionio-0.12.1-bin.tar.gz | tar zx
+RUN wget -O - http://archive.apache.org/dist/predictionio/0.12.1/apache-predictionio-0.12.1-bin.tar.gz | tar zx
 RUN mv PredictionIO* /PredictionIO
 
 RUN useradd elasticsearch
